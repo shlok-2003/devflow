@@ -21,12 +21,13 @@ const config = {
         },
         extend: {
             fontFamily: {
-                "inter": "var(--font-inter)",
+                inter: "var(--font-inter)",
                 "space-grotesk": "var(--font-space-grotesk)",
             },
             colors: {
                 primary: {
-                    "500": "#858EAD",
+                    "100": "#FFF1E6",
+                    "500": "#FF7000",
                     "800": "#FFF1E6",
                 },
                 light: {
