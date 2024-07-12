@@ -1,8 +1,10 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+
+import { Button } from "@/components/ui/button";
+
 import { cn } from "@/lib/utils";
-import { Button } from "../ui/button";
 
 interface NoResultProps extends React.HTMLAttributes<HTMLElement> {
     children?: React.ReactNode;
@@ -22,7 +24,13 @@ const NoResult: React.FC<NoResultProps> = ({
     ...props
 }) => {
     return (
-        <div className={cn("mt-10 flex w-full flex-col items-center justify-center", className)} {...props}>
+        <div
+            className={cn(
+                "mt-10 flex w-full flex-col items-center justify-center",
+                className,
+            )}
+            {...props}
+        >
             <Image
                 src="/assets/images/light-illustration.png"
                 alt="No result illustration"

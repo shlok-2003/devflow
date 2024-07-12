@@ -5,19 +5,14 @@ import { Button } from "@/components/ui/button";
 import Filter from "@/components/shared/filter";
 import NoResult from "@/components/shared/no-result";
 import HomeFilter from "@/components/home/home-filter";
+import QuestionCard from "@/components/cards/question-card";
 import LocalSearch from "@/components/shared/search/local-search";
 
 import { HomePageFilters } from "@/constants/filters";
-import QuestionCard, {
-    QuestionCardProps,
-} from "@/components/cards/question-card";
+import { getQuestions } from "@/lib/actions/question.action";
 
-export default function HomePage() {
-    const result: {
-        questions: QuestionCardProps[];
-    } = {
-        questions: [],
-    };
+export default async function HomePage() {
+    const result = await getQuestions({});
 
     return (
         <Fragment>
@@ -54,21 +49,6 @@ export default function HomePage() {
 
             <div className="mt-10 flex w-full flex-col gap-6">
                 {result.questions.length > 0 ? (
-                    // result.questions.map((question) => {
-                    //     return (
-                    //         <QuestionCard
-                    //             key={question._id}
-                    //             _id={question._id}
-                    //             title={question.title}
-                    //             tags={question.tags}
-                    //             author={question.author}
-                    //             upvotes={question.upvotes}
-                    //             answers={question.answers}
-                    //             views={question.views}
-                    //             createdAt={question.createdAt}
-                    //         />
-                    //     );
-                    // })
                     result.questions.map((question) => (
                         <QuestionCard
                             key={question._id}

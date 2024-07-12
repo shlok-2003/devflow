@@ -3,12 +3,13 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
+import { SignedOut } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
+
+import { Button } from "@/components/ui/button";
 
 import { cn } from "@/lib/utils";
 import { sidebarLinks } from "@/constants";
-import { SignedOut } from "@clerk/nextjs";
-import { Button } from "../ui/button";
 
 interface LeftSideBarProps extends React.HTMLAttributes<HTMLElement> {
     children?: React.ReactNode;
@@ -20,6 +21,7 @@ const LeftSideBar: React.FC<LeftSideBarProps> = ({
     ...props
 }) => {
     const pathname = usePathname();
+
     return (
         <aside
             className={cn(
@@ -92,11 +94,11 @@ const LeftSideBar: React.FC<LeftSideBarProps> = ({
                                 width={20}
                                 height={20}
                                 className="invert-colors lg:hidden"
-                            /> 
+                            />
                             <span className="max-lg:hidden">Sign Up</span>
                         </Button>
                     </Link>
-                </div> 
+                </div>
             </SignedOut>
             {children}
         </aside>

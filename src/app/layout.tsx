@@ -4,6 +4,7 @@ import { ClerkProvider } from "@clerk/nextjs";
 import { ThemeProvider } from "@/context/theme-provider";
 import { Inter, Space_Grotesk as SpaceGrotesk } from "next/font/google";
 import "@/styles/globals.css";
+import "@/styles/prism.css";
 
 const inter = Inter({
     subsets: ["latin"],

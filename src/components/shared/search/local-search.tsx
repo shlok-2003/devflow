@@ -1,9 +1,10 @@
 "use client";
 
 import React from "react";
-import { cn } from "@/lib/utils";
 import Image from "next/image";
 import { Input } from "@/components/ui/input";
+
+import { cn } from "@/lib/utils";
 
 interface LocalSearchProps extends React.HTMLAttributes<HTMLElement> {
     route: string;

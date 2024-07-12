@@ -3,8 +3,11 @@
 import React, { Fragment, useRef, useState } from "react";
 import { z } from "zod";
 import Image from "next/image";
+import { Schema } from "mongoose";
+import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
 import { Editor } from "@tinymce/tinymce-react";
+import { useRouter, usePathname } from "next/navigation";
 
 import {
     Form,
@@ -17,22 +20,26 @@ import {
 } from "@/components/ui/form";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { QuestionsSchema } from "@/lib/validations";
 import { Badge } from "@/components/ui/badge";
 
+import { QuestionsSchema } from "@/lib/validations";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useTheme } from "next-themes";
+import { createQuestion } from "@/lib/actions/question.action";
+import { toast } from "../ui/use-toast";
 
 interface QuestionProps {
     type?: "create" | "edit";
+    mongoUserId: string;
 }
 
-const Question = ({ type }: QuestionProps) => {
+const Question = ({ type, mongoUserId }: QuestionProps) => {
     const editorRef = useRef<any>(null);
 
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
 
     // Router
+    const router = useRouter();
+    const pathname = usePathname();
 
     // For editor dark and light mode
     const { theme } = useTheme();
@@ -46,23 +53,51 @@ const Question = ({ type }: QuestionProps) => {
         },
     });
 
-    function onSubmit(values: z.infer<typeof QuestionsSchema>) {
+    async function onSubmit(values: z.infer<typeof QuestionsSchema>) {
         setIsSubmitting(true);
 
         try {
-            // Do something with the form values
+            await createQuestion({
+                title: values.title,
+                content: values.explanation,
+                tags: values.tags,
+                path: pathname,
+                author: mongoUserId as unknown as Schema.Types.ObjectId,
+            });
+
+            // navigate to home page
+            router.push("/");
         } catch (error) {
+            console.error(`❌ ${error} ❌`);
+            toast({
+                title: `Error ${type === "edit" ? "editing" : "posting"} question ⚠️`,
+                variant: "destructive",
+            });
         } finally {
             setIsSubmitting(false);
+
+            toast({
+                title: `Question ${type === "edit" ? "edited" : "posted"} successfully 🎉`,
+                variant: "default",
+            });
         }
     }
 
+    /**
+     * Handles 'Enter' key events for adding tags to a form field.
+     * Triggers tag addition, validation, or form submission.
+     *
+     * @param {React.KeyboardEvent<HTMLInputElement>} e - The keyboard event.
+     * @param {any} field - The field to which this function is associated.
+     *
+     */
     function handleInputKeyDown(
         e: React.KeyboardEvent<HTMLInputElement>,
         field: any,
     ) {
         if (e.key === "Enter" && field.name === "tags") {
             e.preventDefault();
+
             const tagInput = e.target as HTMLInputElement;
             const tagValue = tagInput.value.trim();
 
@@ -88,13 +123,14 @@ const Question = ({ type }: QuestionProps) => {
         }
     }
 
-    // Handle tag remove
+    /**
+    * Function to remove tags from tag list
+    *
+    */
     const handleTagRemove = (tag: string, field: any) => {
         const newTags = field.value.filter((t: string) => t !== tag);
         form.setValue("tags", newTags);
     };
-
-    console.log(theme)
 
     return (
         <Form {...form}>
@@ -143,6 +179,10 @@ const Question = ({ type }: QuestionProps) => {
                                     onInit={(evt, editor) => {
                                         editorRef.current = editor;
                                     }}
+                                    onBlur={field.onBlur}
+                                    onEditorChange={(content) =>
+                                        field.onChange(content)
+                                    }
                                     initialValue=""
                                     init={{
                                         height: 350,
@@ -181,6 +221,7 @@ const Question = ({ type }: QuestionProps) => {
                                             theme === "dark"
                                                 ? "oxide-dark"
                                                 : "oxide",
+                                        content_css: theme === "dark" && "dark",
                                     }}
                                 />
                             </FormControl>

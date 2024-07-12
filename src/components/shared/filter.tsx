@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import { SelectGroup } from "@radix-ui/react-select";
 
 import {
     Select,
@@ -12,7 +13,6 @@ import {
 
 import { cn } from "@/lib/utils";
 import { FilterProps } from "@/constants/filters";
-import { SelectGroup } from "@radix-ui/react-select";
 
 interface FilterCompProps extends React.HTMLAttributes<HTMLElement> {
     filters: FilterProps[];

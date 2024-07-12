@@ -1,18 +1,19 @@
-import React from "react";
+import { FC, ReactNode, HTMLAttributes } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { SignedIn, UserButton } from "@clerk/nextjs";
 
-import { cn } from "@/lib/utils";
-import ModeToggle from "./mode-toggle";
-import MobileNav from "./mobile-nav";
-import GlobalSearch from "../search/global-search";
+import MobileNav from "@/components/shared/navbar/mobile-nav";
+import ModeToggle from "@/components/shared/navbar/mode-toggle";
+import GlobalSearch from "@/components/shared/search/global-search";
 
-interface NavbarProps extends React.HTMLAttributes<HTMLElement> {
-    children?: React.ReactNode;
+import { cn } from "@/lib/utils";
+
+interface NavbarProps extends HTMLAttributes<HTMLElement> {
+    children?: ReactNode;
 }
 
-const Navbar: React.FC<NavbarProps> = ({ children, className, ...props }) => {
+const Navbar: FC<NavbarProps> = ({ children, className, ...props }) => {
     return (
         <header
             className={cn(
@@ -30,7 +31,7 @@ const Navbar: React.FC<NavbarProps> = ({ children, className, ...props }) => {
                 />
 
                 <p className="h2-bold font-space-grotesk text-dark-100 dark:text-light-900 max-sm:hidden">
-                    Dev <span className="text-primary-500">OverFlow</span>
+                    Dev <span className="text-primary-500">Flow</span>
                 </p>
 
                 {children}

@@ -40,7 +40,7 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
                 {/* Date(on mobile) + Title */}
                 <div>
                     <span className="subtle-regular text-dark400_light700 line-clamp-1 flex sm:hidden">
-                        {String(createdAt)}
+                        {getTimestamp(createdAt)}
                     </span>
 
                     <Link href={`/question/${_id}`}>
@@ -63,24 +63,18 @@ const QuestionCard: React.FC<QuestionCardProps> = ({
 
             {/* Tags */}
             <div className="mt-3.5 flex flex-wrap gap-2">
-                {tags.map((tag) => {
-                    return (
-                        <RenderTag
-                            key={tag._id}
-                            _id={tag._id}
-                            name={tag.name}
-                        />
-                    );
-                })}
+                {tags.map((tag) => (
+                    <RenderTag key={tag._id} _id={tag._id} name={tag.name} />
+                ))}
             </div>
 
             <div className="flex-between mt-6 w-full flex-wrap gap-3">
                 {/* Author */}
-                <Metric 
+                <Metric
                     imgUrl={author.picture}
                     alt="user"
                     value={author.name}
-                    title={`- asket ${getTimestamp(createdAt)}`}
+                    title={`- asked ${getTimestamp(createdAt)}`}
                     href={`/profile/${author.clerkId}`}
                     isAuthor
                     textStyle="body-medium text-dark400_light700"
