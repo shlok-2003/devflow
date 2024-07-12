@@ -1,7 +1,7 @@
 import Link from "next/link";
 import Image from "next/image";
 
-import Votes from "@/components/shared/votes";
+// import Votes from "@/components/shared/votes";
 import Filter from "@/components/shared/filter";
 import ParseHTML from "@/components/shared/parse-html";
 
