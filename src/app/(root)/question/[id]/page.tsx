@@ -8,20 +8,23 @@ import ParseHTML from "@/components/shared/parse-html";
 import RenderTag from "@/components/shared/render-tags";
 import AllAnswers from "@/components/shared/all-answers";
 
-import { getUserByID } from "@/lib/actions/user.action";
+import { getUserById } from "@/lib/actions/user.action";
 import { getQuestionById } from "@/lib/actions/question.action";
 import { formatAndDivideNumber, getTimestamp } from "@/lib/utils";
-
 
 const QuestionDetail = async ({ params, searchParams }: any) => {
     // Access to mongo user
     const { userId: clerkId } = auth();
     let mongoUser;
     if (clerkId) {
-        mongoUser = await getUserByID({ userId: clerkId });
+        mongoUser = await getUserById({ userId: clerkId });
     }
 
     const result = await getQuestionById({ questionId: params.id });
+
+    if (mongoUser === undefined || mongoUser === null) {
+        return;
+    }
 
     return (
         <>
@@ -94,7 +97,7 @@ const QuestionDetail = async ({ params, searchParams }: any) => {
             </div>
 
             {/* Question content */}
-            <ParseHTML data={result.content} />
+            <ParseHTML html={result.content} />
 
             <div className="mt-8 flex flex-wrap gap-2">
                 {result.tags.map((tag: any) => (
