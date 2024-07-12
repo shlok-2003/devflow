@@ -1,3 +1,4 @@
+/* eslint-disable tailwindcss/enforces-shorthand */
 "use client"
 
 // Inspired by react-hot-toast library

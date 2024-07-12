@@ -22,7 +22,7 @@ const UserCard: React.FC<Props> = async ({ user }) => {
             <article className="background-light900_dark200 light-border flex w-full flex-col items-center justify-center rounded-2xl border p-8">
                 <Link href={`/profile/${user.clerkId}`}>
                     <Image
-                        src={user.picture as string}
+                        src={user.picture}
                         alt={user.name as string}
                         width={100}
                         height={100}
