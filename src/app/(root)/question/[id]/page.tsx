@@ -2,7 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 import { auth } from "@clerk/nextjs/server";
 import Votes from "@/components/shared/votes";
-import Answer from "@/components/forms/answer";
+// import Answer from "@/components/forms/answer";
 import Metric from "@/components/shared/metric";
 import ParseHTML from "@/components/shared/parse-html";
 import RenderTag from "@/components/shared/render-tags";
@@ -116,11 +116,11 @@ const QuestionDetail = async ({ params, searchParams }: any) => {
                 totalAnswers={result.answers.length}
             />
 
-            <Answer
+            {/* <Answer
                 question={result.content}
                 questionId={JSON.stringify(result._id)}
                 authorId={JSON.stringify(mongoUser._id)}
-            />
+            /> */}
         </>
     );
 };
