@@ -95,7 +95,7 @@ const Answer = ({ question, questionId, authorId }: AnswerFormProps) => {
 
             // Use this for Gemini AI
             const response = await fetch(
-                `http://localhost:3000/api/gemini`,
+                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/gemini`,
                 {
                     method: "POST",
                     body: JSON.stringify({ question }),
