@@ -65,7 +65,6 @@ export async function globalSearch(params: SearchParams) {
              */
             const modelInfo = modelsAndTypes.find((item) => item.type === type);
 
-            console.log({ modelInfo, type });
             if (!modelInfo) {
                 throw new Error("Invalid search type");
             }

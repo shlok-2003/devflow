@@ -12,7 +12,6 @@ export default async function AskQuestionPage() {
     }
 
     const mongoUser = await getUserById({ userId });
-    console.log(mongoUser);
 
     return (
         <Fragment>

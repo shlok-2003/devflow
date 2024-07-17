@@ -3,8 +3,6 @@ import { NextResponse } from "next/server";
 export const POST = async (req: Request) => {
     const { question } = await req.json();
 
-    // console.log(`🚀 ${question} 🚀`);
-
     try {
         const response = await fetch(
             `https://api.openai.com/v1/chat/completions`,
@@ -32,14 +30,11 @@ export const POST = async (req: Request) => {
         );
 
         const responseData = await response.json();
-        console.log({ responseData });
         if (responseData.error) {
             throw new Error(responseData.error.message);
         }
 
         const reply = responseData.choices[0].message.content;
-
-        console.log(`✅ ${reply} ✅`);
 
         return NextResponse.json({ reply });
     } catch (error: any) {
