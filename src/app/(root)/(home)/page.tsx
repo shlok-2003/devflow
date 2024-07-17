@@ -1,18 +1,47 @@
 import React, { Fragment } from "react";
 import Link from "next/link";
+import { auth } from "@clerk/nextjs/server";
 
 import { Button } from "@/components/ui/button";
 import Filter from "@/components/shared/filter";
 import NoResult from "@/components/shared/no-result";
 import HomeFilter from "@/components/home/home-filter";
+import Pagination from "@/components/shared/pagination";
 import QuestionCard from "@/components/cards/question-card";
 import LocalSearch from "@/components/shared/search/local-search";
 
 import { HomePageFilters } from "@/constants/filters";
-import { getQuestions } from "@/lib/actions/question.action";
+import {
+    getQuestions,
+    getRecommendedQuestions,
+} from "@/lib/actions/question.action";
+import { SearchParamsProps } from "@/types";
 
-export default async function HomePage() {
-    const result = await getQuestions({});
+export default async function HomePage({ searchParams }: SearchParamsProps) {
+    const { userId } = auth();
+
+    let result;
+
+    if (searchParams?.filter === "recommended") {
+        if (userId) {
+            result = await getRecommendedQuestions({
+                userId,
+                searchQuery: searchParams.q,
+                page: searchParams.page ? +searchParams.page : 1,
+            });
+        } else {
+            result = {
+                questions: [],
+                isNext: false,
+            };
+        }
+    } else {
+        result = await getQuestions({
+            searchQuery: searchParams.q,
+            filter: searchParams.filter,
+            page: searchParams.page ? +searchParams.page : 1,
+        });
+    }
 
     return (
         <Fragment>
@@ -49,7 +78,7 @@ export default async function HomePage() {
 
             <div className="mt-10 flex w-full flex-col gap-6">
                 {result.questions.length > 0 ? (
-                    result.questions.map((question) => (
+                    result.questions.map((question: any) => (
                         <QuestionCard
                             key={question._id}
                             _id={question._id}
@@ -72,6 +101,14 @@ export default async function HomePage() {
                           from. Get involved! 💡"
                     />
                 )}
+            </div>
+
+            {/* Pagination */}
+            <div className="mt-10">
+                <Pagination
+                    pageNumber={searchParams?.page ? +searchParams.page : 1}
+                    isNext={result.isNext}
+                />
             </div>
         </Fragment>
     );

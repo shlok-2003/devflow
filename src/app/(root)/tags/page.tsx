@@ -3,13 +3,19 @@ import Link from "next/link";
 
 import Filter from "@/components/shared/filter";
 import NoResult from "@/components/shared/no-result";
+import Pagination from "@/components/shared/pagination";
 import LocalSearchBar from "@/components/shared/search/local-search";
 
+import { SearchParamsProps } from "@/types";
 import { UserFilters } from "@/constants/filters";
 import { getAllTags } from "@/lib/actions/tag.action";
 
-const Tags = async () => {
-    const result = await getAllTags({});
+const Tags = async ({ searchParams }: SearchParamsProps) => {
+    const result = await getAllTags({
+        searchQuery: searchParams.q,
+        filter: searchParams.filter,
+        page: searchParams.page ? +searchParams.page : 1,
+    });
 
     return (
         <Fragment>
@@ -32,7 +38,7 @@ const Tags = async () => {
 
             <section className="mt-12 flex flex-wrap gap-4">
                 {result.tags.length > 0 ? (
-                    result.tags.map((tag) => (
+                    result.tags.map((tag: any) => (
                         <Link
                             key={tag._id}
                             href={`/tags/${tag._id}`}
@@ -63,6 +69,14 @@ const Tags = async () => {
                     />
                 )}
             </section>
+
+            {/* Pagination */}
+            <div className="mt-10">
+                <Pagination
+                    pageNumber={searchParams?.page ? +searchParams.page : 1}
+                    isNext={result.isNext}
+                />
+            </div>
         </Fragment>
     );
 };

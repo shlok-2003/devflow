@@ -145,7 +145,6 @@ export async function getQuestionsByTagId(params: GetQuestionsByTagIdParams) {
         }
 
         const isNext = tag.questions.length > pageSize;
-
         const questions = tag.questions;
 
         return { tagTitle: tag.name, questions, isNext };

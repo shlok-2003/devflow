@@ -10,7 +10,7 @@ const publicRoutes = createRouteMatcher([
     "/community",
     "/jobs",
     "/sign-up(.*)",
-    "/sign-in(.*)"
+    "/sign-in(.*)",
 ]);
 
 export default clerkMiddleware((auth, request) => {

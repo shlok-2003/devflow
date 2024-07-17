@@ -1,30 +1,36 @@
-import Link from "next/link";
-import Image from "next/image";
-import { auth } from "@clerk/nextjs/server";
-import Votes from "@/components/shared/votes";
-// import Answer from "@/components/forms/answer";
+import Answer from "@/components/forms/answer";
+import AllAnswers from "@/components/shared/all-answers";
 import Metric from "@/components/shared/metric";
 import ParseHTML from "@/components/shared/parse-html";
 import RenderTag from "@/components/shared/render-tags";
-import AllAnswers from "@/components/shared/all-answers";
-
-import { getUserById } from "@/lib/actions/user.action";
+import Votes from "@/components/shared/votes";
 import { getQuestionById } from "@/lib/actions/question.action";
+import { getUserById } from "@/lib/actions/user.action";
 import { formatAndDivideNumber, getTimestamp } from "@/lib/utils";
+import { URLProps } from "@/types";
+import { auth } from "@clerk/nextjs/server";
+import Image from "next/image";
+import Link from "next/link";
+import type { IUser, ITag, IQuestion } from "@/database";
 
-const QuestionDetail = async ({ params, searchParams }: any) => {
+const QuestionDetail = async ({ params, searchParams }: URLProps) => {
     // Access to mongo user
     const { userId: clerkId } = auth();
+
     let mongoUser;
     if (clerkId) {
         mongoUser = await getUserById({ userId: clerkId });
     }
 
-    const result = await getQuestionById({ questionId: params.id });
+    type TResult = IQuestion & {
+        tags: ITag[];
+        author: IUser;
+    };
 
-    if (mongoUser === undefined || mongoUser === null) {
-        return;
-    }
+    const result = (await getQuestionById({
+        questionId: params.id,
+    })) as unknown as TResult;
+    if (!result) return null;
 
     return (
         <>
@@ -35,8 +41,8 @@ const QuestionDetail = async ({ params, searchParams }: any) => {
                         className="flex items-center justify-start gap-1"
                     >
                         <Image
-                            src={result.author.picture}
-                            alt={result.author.name}
+                            src={result.author.picture as string}
+                            alt={result.author.name as string}
                             width={22}
                             height={22}
                             className="rounded-full"
@@ -50,12 +56,14 @@ const QuestionDetail = async ({ params, searchParams }: any) => {
                         <Votes
                             type="question"
                             itemId={JSON.stringify(result._id)}
-                            userId={JSON.stringify(mongoUser._id)}
+                            userId={JSON.stringify(mongoUser?._id)}
                             upvotes={result.upvotes.length}
-                            hasUpvoted={result.upvotes.includes(mongoUser._id)}
+                            hasUpvoted={result.upvotes.includes(
+                                mongoUser?._id as any,
+                            )}
                             downvotes={result.downvotes.length}
                             hasDownvoted={result.downvotes.includes(
-                                mongoUser._id,
+                                mongoUser?._id as any,
                             )}
                             hasSaved={mongoUser?.saved.includes(result._id)}
                         />
@@ -111,16 +119,18 @@ const QuestionDetail = async ({ params, searchParams }: any) => {
             </div>
 
             <AllAnswers
-                questionId={result._id}
-                userId={JSON.stringify(mongoUser._id)}
+                questionId={result._id as any}
+                userId={mongoUser?._id as any}
                 totalAnswers={result.answers.length}
+                page={searchParams?.page ? +searchParams.page : 1}
+                filter={searchParams?.filter}
             />
 
-            {/* <Answer
+            <Answer
                 question={result.content}
                 questionId={JSON.stringify(result._id)}
-                authorId={JSON.stringify(mongoUser._id)}
-            /> */}
+                authorId={JSON.stringify(mongoUser?._id)}
+            />
         </>
     );
 };

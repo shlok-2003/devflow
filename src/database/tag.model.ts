@@ -1,6 +1,7 @@
-import { Schema, models, model, Document } from "mongoose";
+import { Schema, models, model, Document, Model, ObjectId } from "mongoose";
 
 export interface ITag extends Document {
+    _id: ObjectId;
     name: string;
     description: string;
     questions: Schema.Types.ObjectId[];
@@ -37,5 +38,5 @@ const tagSchema = new Schema<ITag>({
     },
 });
 
-const Tag = models.Tag || model<ITag>("Tag", tagSchema);
+const Tag: Model<ITag> = models?.Tag || model<ITag>("Tag", tagSchema);
 export default Tag;

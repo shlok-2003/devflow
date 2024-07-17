@@ -1,5 +1,9 @@
+import qs from "query-string";
 import { type ClassValue, clsx } from "clsx";
 import { twMerge } from "tailwind-merge";
+
+import { BadgeCounts } from "@/types";
+import { BADGE_CRITERIA } from "@/constants";
 
 export function cn(...inputs: ClassValue[]) {
     return twMerge(clsx(inputs));
@@ -68,3 +72,159 @@ export const formatAndDivideNumber = (num: number): string => {
         return num.toString();
     }
 };
+
+/**
+ * Formats a Date object into a string that represents the month and year.
+ *
+ * @param date - The Date object to format.
+ * @returns A string in the format "Month Year" (e.g., "September 2023").
+ */
+export const getJoinedDate = (date: Date): string => {
+    // Extract the month and year from the Date object
+    const month = date.toLocaleString("default", { month: "long" });
+    const year = date.getFullYear();
+
+    // Create the joined date string (e.g., "September 2023")
+    const joinedDate = `${month} ${year}`;
+
+    return joinedDate;
+};
+
+interface UrlQueryParams {
+    params: string;
+    key: string;
+    value: string | null;
+}
+/**
+ * Constructs a URL query by modifying the existing
+ * query parameters with the specified key-value pair.
+ *
+ * @param as UrlQueryParams
+ *
+ * @returns {string} - A URL with the updated query parameters.
+ */
+export const formUrlQuery = ({ params, key, value }: UrlQueryParams) => {
+    const currentUrl = qs.parse(params);
+
+    currentUrl[key] = value;
+
+    return qs.stringifyUrl(
+        {
+            url: window.location.pathname,
+            query: currentUrl,
+        },
+        { skipNull: true },
+    );
+};
+
+interface RemoveUrlQueryParams {
+    params: string;
+    keysToRemove: string[];
+}
+/**
+ * Constructs a URL query by modifying the existing query
+ * parameters with the specified key-value pair.
+ *
+ * @param as RemoveUrlQueryParams
+ *
+ * @returns {string} - A URL with the updated query parameters.
+ */
+export const removeKeysFromQuery = ({
+    params,
+    keysToRemove,
+}: RemoveUrlQueryParams) => {
+    const currentUrl = qs.parse(params);
+
+    keysToRemove.forEach((key) => {
+        delete currentUrl[key];
+    });
+
+    return qs.stringifyUrl(
+        {
+            url: window.location.pathname,
+            query: currentUrl,
+        },
+        { skipNull: true },
+    );
+};
+
+interface BadgeParam {
+    criteria: {
+        type: keyof typeof BADGE_CRITERIA;
+        count: number;
+    }[];
+}
+/**
+ * Assigns badges based on specific criteria.
+ * The function takes a `BadgeParam` parameter object that defines criteria
+ * for each badge type. Badges are assigned based on the specified count
+ * in the criteria. Badge levels (GOLD, SILVER, BRONZE) are defined by
+ * the constant BADGE_CRITERIA. For each badge type and level, if the specified
+ * count exceeds or reaches the defined threshold, the corresponding count
+ * for that badge level is incremented.
+ *
+ * @param params - Parameter object of type `BadgeParam` containing criteria for badge assignment.
+ * @returns A `BadgeCounts` object representing the number of badges assigned for each level.
+ */
+export const assignBadges = (params: BadgeParam) => {
+    const badgeCounts: BadgeCounts = {
+        GOLD: 0,
+        SILVER: 0,
+        BRONZE: 0,
+    };
+
+    const { criteria } = params;
+
+    criteria.forEach((item) => {
+        const { type, count } = item;
+        const badgeLevels: any = BADGE_CRITERIA[type];
+
+        Object.keys(badgeLevels).forEach((level: any) => {
+            if (count >= badgeLevels[level]) {
+                badgeCounts[level as keyof BadgeCounts] += 1;
+            }
+        });
+    });
+
+    return badgeCounts;
+};
+
+/**
+ * Processes a job title to ensure it is valid and meaningful.
+ * If the input title is undefined or null, it returns 'No Job Title'.
+ * It splits the title into words, filters out unwanted words
+ * (undefined, null, 'undefined', 'null'),
+ * and joins the valid words to create the processed title.
+ *
+ * @param title - The job title to be processed.
+ * @returns A processed job title or 'No Job Title' if the input is undefined, null, or contains no valid words.
+ */
+export function processJobTitle(title: string | undefined | null): string {
+    // Check if title is undefined or null
+    if (title === undefined || title === null) {
+        return "No Job Title";
+    }
+
+    // Split the title into words
+    const words = title.split(" ");
+
+    // Filter out undefined or null and other unwanted words
+    const validWords = words.filter((word) => {
+        return (
+            word !== undefined &&
+            word !== null &&
+            word.toLowerCase() !== "undefined" &&
+            word.toLowerCase() !== "null"
+        );
+    });
+
+    // If no valid words are left, return the general title
+    if (validWords.length === 0) {
+        return "No Job Title";
+    }
+
+    // Join the valid words to create the processed title
+    const processedTitle = validWords.join(" ");
+
+    return processedTitle;
+}

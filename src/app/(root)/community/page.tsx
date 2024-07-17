@@ -1,20 +1,28 @@
 import { Fragment } from "react";
 import Link from "next/link";
+
 import Filter from "@/components/shared/filter";
 import UserCard from "@/components/cards/user-card";
-import LocalSearchbar from "@/components/shared/search/local-search";
+import Pagination from "@/components/shared/pagination";
+import LocalSearch from "@/components/shared/search/local-search";
+
 import { UserFilters } from "@/constants/filters";
 import { getAllUsers } from "@/lib/actions/user.action";
+import { SearchParamsProps } from "@/types";
 
-const Community = async () => {
-    const result = await getAllUsers({});
+const Community = async ({ searchParams }: SearchParamsProps) => {
+    const result = await getAllUsers({
+        searchQuery: searchParams.q,
+        filter: searchParams.filter,
+        page: searchParams.page ? +searchParams.page : 1,
+    });
 
     return (
         <Fragment>
             <h1 className="h1-bold text-dark100_light900">All Users</h1>
 
             <div className="mt-11 flex justify-between gap-5 max-sm:flex-col sm:items-center">
-                <LocalSearchbar
+                <LocalSearch
                     route="/community"
                     iconPosition="left"
                     imgSrc="/assets/icons/search.svg"
@@ -45,6 +53,14 @@ const Community = async () => {
                     </div>
                 )}
             </section>
+
+            {/* Pagination */}
+            <div className="mt-10">
+                <Pagination
+                    pageNumber={searchParams?.page ? +searchParams.page : 1}
+                    isNext={result.isNext}
+                />
+            </div>
         </Fragment>
     );
 };

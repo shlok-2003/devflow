@@ -14,11 +14,11 @@ interface Props {
 
 const UserCard: React.FC<Props> = async ({ user }) => {
     const interactedTags = await getTopInteractedTags({
-        userId: user._id as string,
+        userId: user._id as unknown as string,
     });
 
     return (
-        <div className="shadow-light100_darknone xs:w-[260px] w-full max-sm:w-full">
+        <div className="shadow-light100_darknone xs:w-[260px] w-full max-sm:w-full xl:max-w-[350px]">
             <article className="background-light900_dark200 light-border flex w-full flex-col items-center justify-center rounded-2xl border p-8">
                 <Link href={`/profile/${user.clerkId}`}>
                     <Image
@@ -46,10 +46,10 @@ const UserCard: React.FC<Props> = async ({ user }) => {
                 <div className="mt-5">
                     {interactedTags.length > 0 ? (
                         <div className="flex items-center gap-2">
-                            {interactedTags.map((tag) => (
+                            {interactedTags.map((tag, index) => (
                                 <RenderTag
-                                    key={tag._id}
-                                    _id={tag._id}
+                                    key={index}
+                                    _id={tag._id as unknown as string}
                                     name={tag.name}
                                 />
                             ))}

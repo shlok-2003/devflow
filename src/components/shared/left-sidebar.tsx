@@ -3,7 +3,7 @@
 import React from "react";
 import Link from "next/link";
 import Image from "next/image";
-import { SignedOut } from "@clerk/nextjs";
+import { SignedOut, useAuth } from "@clerk/nextjs";
 import { usePathname } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
@@ -22,6 +22,8 @@ const LeftSideBar: React.FC<LeftSideBarProps> = ({
 }) => {
     const pathname = usePathname();
 
+    const { userId } = useAuth();
+
     return (
         <aside
             className={cn(
@@ -36,6 +38,12 @@ const LeftSideBar: React.FC<LeftSideBarProps> = ({
                         (pathname.includes(item.route) &&
                             item.route.length > 1) ||
                         pathname === item.route;
+
+                    if (item.route === "/profile") {
+                        if (!userId) return null;
+
+                        item.route = `/profile/${userId}`;
+                    }
 
                     return (
                         <Link

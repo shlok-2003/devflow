@@ -3,7 +3,6 @@
 import React, { Fragment, useRef, useState } from "react";
 import { z } from "zod";
 import Image from "next/image";
-import { Schema } from "mongoose";
 import { useTheme } from "next-themes";
 import { useForm } from "react-hook-form";
 import { Editor } from "@tinymce/tinymce-react";
@@ -30,9 +29,10 @@ import { toast } from "../ui/use-toast";
 interface QuestionProps {
     type?: "create" | "edit";
     mongoUserId: string;
+    questionDetails?: string;
 }
 
-const Question = ({ type, mongoUserId }: QuestionProps) => {
+const Question = ({ type, mongoUserId, questionDetails }: QuestionProps) => {
     const editorRef = useRef<any>(null);
 
     const [isSubmitting, setIsSubmitting] = useState<boolean>(false);
@@ -44,12 +44,15 @@ const Question = ({ type, mongoUserId }: QuestionProps) => {
     // For editor dark and light mode
     const { theme } = useTheme();
 
+    const parseQuestions = questionDetails && JSON.parse(questionDetails || "");
+    const groupedTags = parseQuestions?.tags.map((tag: any) => tag.name);
+
     const form = useForm<z.infer<typeof QuestionsSchema>>({
         resolver: zodResolver(QuestionsSchema),
         defaultValues: {
-            title: "",
-            explanation: "",
-            tags: [],
+            title: parseQuestions?.title || "",
+            explanation: parseQuestions?.content || "",
+            tags: groupedTags || [],
         },
     });
 
@@ -62,7 +65,7 @@ const Question = ({ type, mongoUserId }: QuestionProps) => {
                 content: values.explanation,
                 tags: values.tags,
                 path: pathname,
-                author: mongoUserId as unknown as Schema.Types.ObjectId,
+                author: JSON.parse(mongoUserId),
             });
 
             // navigate to home page
@@ -124,9 +127,9 @@ const Question = ({ type, mongoUserId }: QuestionProps) => {
     }
 
     /**
-    * Function to remove tags from tag list
-    *
-    */
+     * Function to remove tags from tag list
+     *
+     */
     const handleTagRemove = (tag: string, field: any) => {
         const newTags = field.value.filter((t: string) => t !== tag);
         form.setValue("tags", newTags);
@@ -183,7 +186,7 @@ const Question = ({ type, mongoUserId }: QuestionProps) => {
                                     onEditorChange={(content) =>
                                         field.onChange(content)
                                     }
-                                    initialValue=""
+                                    initialValue={parseQuestions?.content || ""}
                                     init={{
                                         height: 350,
                                         menubar: false,
@@ -247,6 +250,7 @@ const Question = ({ type, mongoUserId }: QuestionProps) => {
                                 <Fragment>
                                     <Input
                                         placeholder="Add tags..."
+                                        disabled={type === "edit"}
                                         className="no-focus paragraph-regular background-light900_dark300 light-border-2 text-dark300_light700 min-h-[56px] border"
                                         onKeyDown={(e) => {
                                             handleInputKeyDown(e, field);
@@ -263,21 +267,23 @@ const Question = ({ type, mongoUserId }: QuestionProps) => {
                                                     <Badge
                                                         key={`${tag}-${index}`}
                                                         className="subtle-medium background-light800_dark300 text-light400_light500 flex items-center gap-2 rounded-md border-none px-4 py-2 capitalize"
-                                                        onClick={() =>
-                                                            handleTagRemove(
-                                                                tag,
-                                                                field,
-                                                            )
-                                                        }
                                                     >
                                                         {tag}
-                                                        <Image
-                                                            src="/assets/icons/close.svg"
-                                                            width={12}
-                                                            height={12}
-                                                            alt="close icon"
-                                                            className="cursor-pointer object-contain invert-0 dark:invert"
-                                                        />
+                                                        {type !== "edit" && (
+                                                            <Image
+                                                                src="/assets/icons/close.svg"
+                                                                width={12}
+                                                                height={12}
+                                                                alt="close icon"
+                                                                className="cursor-pointer object-contain invert-0 dark:invert"
+                                                                onClick={() =>
+                                                                    handleTagRemove(
+                                                                        tag,
+                                                                        field,
+                                                                    )
+                                                                }
+                                                            />
+                                                        )}
                                                     </Badge>
                                                 ),
                                             )}

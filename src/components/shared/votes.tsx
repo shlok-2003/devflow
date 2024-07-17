@@ -1,10 +1,21 @@
 "use client";
 
 import Image from "next/image";
+import { useEffect } from "react";
+import { usePathname, useRouter } from "next/navigation";
+
 import { formatAndDivideNumber } from "@/lib/utils";
+import {
+    downvoteQuestion,
+    upvoteQuestion,
+} from "@/lib/actions/question.action";
+import { toast } from "../ui/use-toast";
+import { downvoteAnswer, upvoteAnswer } from "@/lib/actions/answer.action";
+import { toggleSaveQuestion } from "@/lib/actions/user.action";
+import { viewQuestion } from "@/lib/actions/interaction.action";
 
 interface Props {
-    type: string;
+    type: "question" | "answer";
     itemId: string;
     userId: string;
     upvotes: number;
@@ -24,9 +35,96 @@ const Votes = ({
     hasDownvoted,
     hasSaved,
 }: Props) => {
-    const handleSave = () => {};
+    const router = useRouter();
+    const pathname = usePathname();
 
-    const handleVote = (action: string) => {};
+    const handleSave = async () => {
+        if (!userId) {
+            return toast({
+                title: "Not Signed In",
+                description: "Please sign in to save",
+            });
+        }
+
+        // Toggle save question
+        await toggleSaveQuestion({
+            questionId: JSON.parse(itemId),
+            userId: JSON.parse(userId),
+            path: pathname,
+        });
+
+        return toast({
+            title: `Question ${hasSaved ? "un" : ""}saved`,
+            variant: hasSaved ? "default" : "destructive",
+        });
+    };
+    const handleVote = async (action: "upvote" | "downvote") => {
+        if (!userId) {
+            return toast({
+                title: "Not Signed In",
+                description: "Please sign in to vote",
+            });
+        }
+
+        if (action === "upvote") {
+            if (type === "question") {
+                await upvoteQuestion({
+                    questionId: JSON.parse(itemId),
+                    userId: JSON.parse(userId),
+                    hasUpvoted,
+                    hasDownvoted,
+                    path: pathname,
+                });
+            } else if (type === "answer") {
+                await upvoteAnswer({
+                    answerId: JSON.parse(itemId),
+                    userId: JSON.parse(userId),
+                    hasUpvoted,
+                    hasDownvoted,
+                    path: pathname,
+                });
+            }
+
+            return toast({
+                title: `Upvote ${!hasUpvoted ? "added" : "remove"}`,
+                variant: !hasUpvoted ? "default" : "destructive",
+            });
+        }
+
+        if (action === "downvote") {
+            if (type === "question") {
+                await downvoteQuestion({
+                    questionId: JSON.parse(itemId),
+                    userId: JSON.parse(userId),
+                    hasUpvoted,
+                    hasDownvoted,
+                    path: pathname,
+                });
+            } else if (type === "answer") {
+                await downvoteAnswer({
+                    answerId: JSON.parse(itemId),
+                    userId: JSON.parse(userId),
+                    hasUpvoted,
+                    hasDownvoted,
+                    path: pathname,
+                });
+            }
+
+            return toast({
+                title: `Downvote ${hasDownvoted ? "removed" : "added"}`,
+                variant: hasDownvoted ? "default" : "destructive",
+            });
+        }
+    };
+
+    useEffect(() => {
+        viewQuestion({
+            questionId: JSON.parse(itemId),
+            userId: userId ? JSON.parse(userId) : undefined,
+        });
+
+        console.log("Viewed question");
+    }, [itemId, userId, pathname, router]);
 
     return (
         <div className="flex gap-5">
@@ -74,18 +172,20 @@ const Votes = ({
                 </div>
             </div>
 
-            <Image
-                src={
-                    hasSaved
-                        ? "/assets/icons/star-filled.svg"
-                        : "/assets/icons/star-red.svg"
-                }
-                alt={hasSaved ? "star-filled" : "star-red"}
-                width={18}
-                height={18}
-                className="cursor-pointer"
-                onClick={() => handleSave}
-            />
+            {type === "question" && (
+                <Image
+                    src={
+                        hasSaved
+                            ? "/assets/icons/star-filled.svg"
+                            : "/assets/icons/star-red.svg"
+                    }
+                    alt={hasSaved ? "star-filled" : "star-red"}
+                    width={18}
+                    height={18}
+                    className="cursor-pointer"
+                    onClick={() => handleSave}
+                />
+            )}
         </div>
     );
 };

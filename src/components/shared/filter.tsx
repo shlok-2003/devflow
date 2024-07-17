@@ -11,8 +11,9 @@ import {
     SelectValue,
 } from "@/components/ui/select";
 
-import { cn } from "@/lib/utils";
+import { cn, formUrlQuery } from "@/lib/utils";
 import { FilterProps } from "@/constants/filters";
+import { useRouter, useSearchParams } from "next/navigation";
 
 interface FilterCompProps extends React.HTMLAttributes<HTMLElement> {
     filters: FilterProps[];
@@ -25,9 +26,27 @@ const Filter: React.FC<FilterCompProps> = ({
     triggerClassName = "",
     ...props
 }) => {
+    const router = useRouter();
+    const searchParams = useSearchParams();
+
+    const paramFilter = searchParams.get("filter");
+
+    const handleUpdateParams = (value: string) => {
+        const newUrl = formUrlQuery({
+            params: searchParams.toString(),
+            key: "filter",
+            value,
+        });
+
+        router.push(newUrl, { scroll: false });
+    };
+
     return (
         <div className={cn("relative", className)} {...props}>
-            <Select>
+            <Select
+                onValueChange={(value) => handleUpdateParams(value)}
+                defaultValue={paramFilter || undefined}
+            >
                 <SelectTrigger
                     className={cn(
                         "body-regular light-border background-light800_dark300 text-dark500_light700 border px-5 py-2.5",

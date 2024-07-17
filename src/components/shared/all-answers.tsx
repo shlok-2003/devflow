@@ -2,6 +2,7 @@ import Link from "next/link";
 import Image from "next/image";
 
 // import Votes from "@/components/shared/votes";
+import Votes from "@/components/shared/votes";
 import Filter from "@/components/shared/filter";
 import ParseHTML from "@/components/shared/parse-html";
 
@@ -14,7 +15,7 @@ interface Props {
     userId: string;
     totalAnswers: number;
     page?: number;
-    filter?: number;
+    filter?: string;
 }
 
 const AllAnswers = async ({
@@ -24,7 +25,7 @@ const AllAnswers = async ({
     page,
     filter,
 }: Props) => {
-    const result = await getAnswers({ questionId });
+    const result = await getAnswers({ questionId, sortBy: filter, page });
 
     return (
         <div className="mt-11">
@@ -37,7 +38,7 @@ const AllAnswers = async ({
             </div>
 
             <div>
-                {result.answers.map((answer) => (
+                {result.answers.map((answer: any) => (
                     <article
                         key={answer._id}
                         className="light-border border-b py-10"
@@ -69,7 +70,19 @@ const AllAnswers = async ({
                                 </Link>
 
                                 <div className="flex justify-end">
-                                    {/* <Votes /> */}
+                                    <Votes
+                                        type="answer"
+                                        itemId={JSON.stringify(answer._id)}
+                                        userId={JSON.stringify(userId)}
+                                        upvotes={answer.upvotes.length}
+                                        hasUpvoted={answer.upvotes.includes(
+                                            userId,
+                                        )}
+                                        downvotes={answer.downvotes.length}
+                                        hasDownvoted={answer.downvotes.includes(
+                                            userId,
+                                        )}
+                                    />
                                 </div>
                             </div>
                         </div>
