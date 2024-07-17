@@ -122,8 +122,7 @@ const Votes = ({
             questionId: JSON.parse(itemId),
             userId: userId ? JSON.parse(userId) : undefined,
         });
-
-        console.log("Viewed question");
+        
     }, [itemId, userId, pathname, router]);
 
     return (

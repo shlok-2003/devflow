@@ -41,6 +41,8 @@ export default function RootLayout({
                                 "primary-text-gradient hover:text-primary-500",
                         },
                     }}
+                    signInFallbackRedirectUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_IN_FALLBACK_REDIRECT_URL}
+                    signUpFallbackRedirectUrl={process.env.NEXT_PUBLIC_CLERK_SIGN_UP_FALLBACK_REDIRECT_URL}
                 >
                     <ThemeProvider
                         attribute="class"
