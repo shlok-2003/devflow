@@ -37,7 +37,7 @@ export async function createAnswer(params: CreateAnswerParams) {
         await Interaction.create({
             user: author,
             answer: answer._id,
-            type: "answer",
+            action: "answer",
             tags: questionObj?.tags,
         });
 

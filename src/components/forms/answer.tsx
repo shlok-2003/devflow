@@ -84,16 +84,27 @@ const Answer = ({ question, questionId, authorId }: AnswerFormProps) => {
         setIsSubmittingAI(true);
 
         try {
+            // ! Use this for Chat GPT
+            // const response = await fetch(
+            //     `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chatgpt`,
+            //     {
+            //         method: "POST",
+            //         body: JSON.stringify({ question }),
+            //     },
+            // );
+
+            // Use this for Gemini AI
             const response = await fetch(
-                `${process.env.NEXT_PUBLIC_SERVER_URL}/api/chatgpt`,
+                `http://localhost:3000/api/gemini`,
                 {
                     method: "POST",
                     body: JSON.stringify({ question }),
                 },
-            );
+            )
 
             const aiAnswer = await response.json();
 
+            console.log(`✅ ${aiAnswer} ✅`);
             // Convert plain text to HTML format
             const formattedAnswer = aiAnswer.reply.replace(/\n/g, "<br />");
 
