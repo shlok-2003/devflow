@@ -41,7 +41,6 @@ const Navbar: FC<NavbarProps> = ({ children, className, ...props }) => {
                 <ModeToggle />
                 <SignedIn>
                     <UserButton
-                        afterSignOutUrl="/"
                         appearance={{
                             elements: {
                                 avatarBox: "size-10",
